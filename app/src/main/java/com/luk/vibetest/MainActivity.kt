@@ -131,6 +131,41 @@ class MainActivity : AppCompatActivity() {
          */
         LOW_TICK,
     }
+    internal enum class WaveformEffects(val durations: LongArray, val amplitudes: IntArray) {
+        DOUBLE_PULSE(
+            longArrayOf(50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200),
+            intArrayOf(33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255)
+        ),
+        TRIPLE_PULSE(
+            longArrayOf(0, 100, 200, 100, 300, 100),
+            intArrayOf(255, 0, 128, 0, 255, 0)
+        ),
+        RAMP_UP(
+            longArrayOf(0, 50, 50, 50, 50, 50),
+            intArrayOf(0, 50, 100, 150, 200, 255)
+        ),
+        RAMP_DOWN(
+            longArrayOf(0, 50, 50, 50, 50, 50),
+            intArrayOf(255, 200, 150, 100, 50, 0)
+        ),
+        HEARTBEAT(
+            longArrayOf(0, 50, 100, 50, 300),
+            intArrayOf(255, 0, 255, 0, 0)
+        ),
+        BUZZ(
+            longArrayOf(0, 200, 100, 200),
+            intArrayOf(255, 0, 255, 0)
+        ),
+        LONG_BUZZ(
+            longArrayOf(0, 500),
+            intArrayOf(255, 0)
+        ),
+        SHORT_PULSE(
+            longArrayOf(0, 50, 100, 50, 100, 50),
+            intArrayOf(255, 0, 255, 0, 255, 0)
+        )
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -190,10 +225,29 @@ class MainActivity : AppCompatActivity() {
             button.text = it.name
             button.setOnClickListener { _ ->
                 val vib = getSystemService(Vibrator::class.java)
-                    vib.vibrate(
-                        VibrationEffect.startComposition().addPrimitive(
-                            it.ordinal).compose()
-                    )
+                vib.vibrate(
+                    VibrationEffect.startComposition().addPrimitive(
+                        it.ordinal).compose()
+                )
+            }
+
+            val layout = findViewById<View>(R.id.layout) as LinearLayout
+            layout.addView(
+                button,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+        enumValues<WaveformEffects>().forEach {
+            val button = Button(this)
+            button.text = it.name
+            button.setOnClickListener { _ ->
+                val vib = getSystemService(Vibrator::class.java)
+                vib.vibrate(
+                    VibrationEffect.createWaveform(it.durations, it.amplitudes, -1)
+                )
             }
 
             val layout = findViewById<View>(R.id.layout) as LinearLayout
