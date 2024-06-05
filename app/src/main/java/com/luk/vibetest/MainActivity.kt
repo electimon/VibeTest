@@ -71,6 +71,67 @@ class MainActivity : AppCompatActivity() {
         TEXTURE_TICK
     }
 
+    internal enum class PrimitiveEffect {
+        /**
+         * No haptic effect. Used to generate extended delays between primitives.
+         *
+         * Support is required.
+         */
+        NOOP,
+        /**
+         * This effect should produce a sharp, crisp click sensation.
+         *
+         * Support is required.
+         */
+        CLICK,
+        /**
+         * A haptic effect that simulates downwards movement with gravity. Often
+         * followed by extra energy of hitting and reverberation to augment
+         * physicality.
+         *
+         * Support is optional.
+         */
+        THUD,
+        /**
+         * A haptic effect that simulates spinning momentum.
+         *
+         * Support is optional.
+         */
+        SPIN,
+        /**
+         * A haptic effect that simulates quick upward movement against gravity.
+         *
+         * Support is required.
+         */
+        QUICK_RISE,
+        /**
+         * A haptic effect that simulates slow upward movement against gravity.
+         *
+         * Support is required.
+         */
+        SLOW_RISE,
+        /**
+         * A haptic effect that simulates quick downwards movement with gravity.
+         *
+         * Support is required.
+         */
+        QUICK_FALL,
+        /**
+         * This very short effect should produce a light crisp sensation intended
+         * to be used repetitively for dynamic feedback.
+         *
+         * Support is required.
+         */
+        LIGHT_TICK,
+        /**
+         * This very short low frequency effect should produce a light crisp sensation intended
+         * to be used repetitively for dynamic feedback.
+         *
+         * Support is required.
+         */
+        LOW_TICK,
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -113,6 +174,26 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     vib.vibrate(VibrationEffect.createPredefined(it.ordinal))
                 }
+            }
+
+            val layout = findViewById<View>(R.id.layout) as LinearLayout
+            layout.addView(
+                button,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+        enumValues<PrimitiveEffect>().forEach {
+            val button = Button(this)
+            button.text = it.name
+            button.setOnClickListener { _ ->
+                val vib = getSystemService(Vibrator::class.java)
+                    vib.vibrate(
+                        VibrationEffect.startComposition().addPrimitive(
+                            it.ordinal).compose()
+                    )
             }
 
             val layout = findViewById<View>(R.id.layout) as LinearLayout
